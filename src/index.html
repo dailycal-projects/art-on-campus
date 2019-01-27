@@ -1,0 +1,149 @@
+<html>
+<head>
+    <link rel="stylesheet" href="../leaflet/leaflet.css" />
+    <link rel="stylesheet" href="./style.css" />
+    <script src="../leaflet/leaflet.js"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="../waypoints/noframework.waypoints.min.js"></script>
+    <script src="./map.js"></script>
+</head>
+<body>
+    <header>
+	    <main>
+
+        <div class="introduction">
+            <p style="height: 250px">
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+            </p>
+        </div>
+
+		<div class="text_and_graphic_and_picture">
+			<div class="graphic_text">
+				<p class="trigger" data-step="0" style="height: 500px;">This is the first art work. The Grizzly Bears are blahblahblah. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+				<p class="trigger" data-step="1" style="height: 500px;">This is the second art wrk. These are football players of some kind. Iconic, have helped us win many games against Stanford.</p>
+				<p class="trigger" data-step="2" style="height: 500px;">This is the third art work. Thinking emoji</p>
+                <p class="trigger" data-step="3" style="height: 500px;">This is the fourth art wrk. Clown emoji</p>
+			</div>
+
+            <div class="graphic_and_picture">
+                <div class="graphic_map" id="map">
+                </div>
+
+                <div class="graphic_picture">
+                    <img class="art_picture" src="" alt="">
+                </div>
+
+
+            </div>
+
+		</div>
+
+
+	</main>
+
+</header>
+
+<script>
+		(function() {
+
+            var artLocations = [{"coordinates":[37.870782, -122.262313], "name": "The Football Players", "imageLink": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/The_Football_Players_by_Douglas_Tilden%2C_view_2_-_University_of_California%2C_Berkeley_-_DSC04938.JPG/150px-The_Football_Players_by_Douglas_Tilden%2C_view_2_-_University_of_California%2C_Berkeley_-_DSC04938.JPG"},
+                 {"coordinates":[37.870232, -122.261735], "name": "The Grizzly Bears", "imageLink": "https://www.berkeley.edu/news/media/releases/2002/08/images/bear.jpg"},
+                 {"coordinates":[37.872141, -122.256799], "name": "Art 3", "imageLink": "https://cdn.shopify.com/s/files/1/1061/1924/files/Thinking_Face_Emoji.png?9898922749706957214"},
+                 {"coordinates":[37.873632, -122.263612], "name": "Art 4", "imageLink": "https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-11/256/clown-face.png"},
+            ];
+
+			// helper function so we can map over dom selection
+			function selectionToArray(selection) {
+				var len = selection.length
+				var result = []
+				for (var i = 0; i < len; i++) {
+					result.push(selection[i])
+				}
+				return result
+			}
+
+			function waypoints() {
+
+                // define screen heights for proper placements
+                var viewportHeight = window.innerHeight
+
+				// select graphic and trigger elements
+				var graphicEl = document.querySelector('.text_and_graphic_and_picture')
+				var graphicVisEl = graphicEl.querySelector('.graphic_map')
+				var triggerEls = selectionToArray(graphicEl.querySelectorAll('.trigger'))
+
+				// viewport height
+				var viewportHeight = window.innerHeight
+				var halfViewportHeight = Math.floor(viewportHeight / 2)
+
+				// global function creates the map and populates the .map div with it
+                // also creates an 'update' function (map.update) which can be called by a trigger
+                var map = createMap('map')
+
+                // // function which populates
+                // var picture = choosePicture('.picture')
+
+				// handle the fixed/static position of grahpic
+				var toggle = function(fixed, bottom) {
+					if (fixed) graphicVisEl.classList.add('is-fixed')
+					else graphicVisEl.classList.remove('is-fixed')
+
+					if (bottom) graphicVisEl.classList.add('is-bottom')
+					else graphicVisEl.classList.remove('is-bottom')
+				}
+
+				// setup a waypoint trigger for each trigger element
+				triggerEls.map(function(el) {
+
+					// get the step, cast as number
+					var step = el.getAttribute('data-step')
+
+					return new Waypoint({
+						element: el, // our trigger element
+						handler: function(direction) {
+							// if the direction is down then we use that number,
+							// else, we want to trigger the previous one
+							var nextStep = direction === 'down' ? step : Math.max(0, step - 1)
+
+							// tell our graphic to update with a specific step
+							map.update(nextStep)
+
+                            // update pic
+                            document.querySelector('.art_picture').setAttribute('src', artLocations[step].imageLink)
+
+						},
+						offset: '33%',  // trigger halfway up the viewport
+					})
+				})
+
+				// set up a waypoint trigger for entering into the actual scrollable graphic section
+                // this should create the actual map and stuff too
+				var enterWaypoint = new Waypoint({
+					element: graphicEl,
+					handler: function(direction) {
+						var fixed = direction === 'down'
+						var bottom = false
+						toggle(fixed, bottom)
+
+					},
+
+				})
+				var exitWaypoint = new Waypoint({
+					element: graphicEl,
+					handler: function(direction) {
+						var fixed = direction === 'up'
+						var bottom = !fixed
+						toggle(fixed, bottom)
+					},
+					offset: 'bottom-in-view',
+				})
+
+			}
+
+			waypoints()
+
+		})()
+	</script>
+
+</body>
+</html>

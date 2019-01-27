@@ -1,0 +1,28 @@
+
+
+.graphic_text {
+    width:40%;
+    margin: 0px;
+    float: left;
+}
+
+.graphic_and_picture {
+    width: 40%;
+    height: 100%;
+    float: left;
+    position: fixed;
+}
+.graphic_map {
+    width: 45%;
+    height: 100%;
+    margin: 0px;
+    float:left;
+}
+
+.graphic_picture {
+    width: 45%;
+    height: 100%;
+    margin: 0px;
+    float:right;
+
+}
